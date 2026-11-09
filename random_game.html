@@ -235,8 +235,8 @@
 <!-- ⑤ 랭킹 -->
 <div id="rank-screen" class="screen hidden">
   <button class="btn-small back-corner" data-menu>← 메뉴</button>
-  <h1 style="font-size:34px;">🏆 랭킹 (이번 세션)</h1>
-  <div class="sub">새로고침하면 초기화돼! 최고 기록에 도전해봐</div>
+  <h1 style="font-size:34px;">🏆 랭킹</h1>
+  <div class="sub">이 브라우저에 저장돼! 최고 기록에 도전해봐</div>
   <table id="rank-table"></table>
 </div>
 
@@ -386,6 +386,8 @@ const $ = id => document.getElementById(id);
 let playerName = "○○";
 const NPC_NAMES = ["취한 콤이", "안 취한 콤이", "만취 콤이"];
 function rndOf(a){ return a[Math.floor(Math.random()*a.length)]; }
+/* 사용자 입력을 innerHTML에 넣을 때는 꼭 esc()를 거친다 */
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function doodleSVG(){
   return `<svg viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
     <path d="M45 28 Q42 12 60 8 Q80 5 86 18 Q90 30 78 36 Q62 42 50 36 Q45 33 45 28 Z"/>
@@ -423,10 +425,10 @@ function bubbleSay(p, text, ms=900){
   clearTimeout(p._bt); p._bt = setTimeout(() => p.bubble.classList.remove("show"), ms);
 }
 function hop(p){ p.doodle.classList.remove("beat-hop"); void p.doodle.offsetWidth; p.doodle.classList.add("beat-hop"); }
-const SCREENS = ["start-screen","chant-screen","menu-screen","explain-screen","rank-screen",
-  "game31-screen","rhythm-screen","subway-screen","eomok-screen","gongsan-screen","hoppang-screen","shoot-screen","generic-screen"];
-function showScreen(id){ SCREENS.forEach(s => $(s).classList.toggle("hidden", s !== id)); }
-function stopAll(){ stopRhythm(); stopSubway(); stopEomok(); stopGongsan(); stopHoppang(); stopShoot(); stopGeneric(); }
+/* class="screen"인 화면 중 id 하나만 보이게. 화면을 추가해도 목록을 고칠 필요 없음 */
+function showScreen(id){ document.querySelectorAll(".screen").forEach(s => s.classList.toggle("hidden", s.id !== id)); }
+/* 엔진 목록은 파일 맨 끝의 ENGINES 표에 있다 */
+function stopAll(){ ENGINES.forEach(e => e.stop()); }
 
 /* ---- 오디오 ---- */
 let AC = null;
@@ -445,10 +447,34 @@ function click(type){
   }catch(e){}
 }
 
-/* ---- 랭킹 (세션 메모리) ---- */
-const REC = {};   // { key: { val, label } }
+/* ---- 랭킹 (localStorage에 저장, 실패하면 메모리만) ---- */
+const REC_KEY = "random-game-rec";
+const REC = (() => { try{ return JSON.parse(localStorage.getItem(REC_KEY)) || {}; }catch(e){ return {}; } })();   // { key: { val, label } }
 function saveRec(key, val, labelFn){
-  if(!REC[key] || val > REC[key].val) REC[key] = { val, label: labelFn(val) };
+  if(!REC[key] || val > REC[key].val){
+    REC[key] = { val, label: labelFn(val) };
+    try{ localStorage.setItem(REC_KEY, JSON.stringify(REC)); }catch(e){}
+  }
+}
+
+/* ---- 엔진 공통 ---- */
+/* 판 상태 정리: over 표시 → 루프·타이머 취소. 이미 예약된 콜백은 over를 보고 멈춘다 */
+function haltState(S){
+  if(!S) return;
+  S.over = true;
+  cancelAnimationFrame(S.raf); clearTimeout(S.timer);
+  if(S.timers) S.timers.forEach(clearTimeout);
+}
+/* 걸렸을 때 공통 처리: 효과음·흔들기·기록 저장·"마셔~" 메시지·재시작 버튼
+   html을 주면 기본 메시지 대신 그걸 쓰고, extra는 기록 줄 뒤에 붙는다 */
+function showLose({ key, val, loser, msgId, restartId, why = "", html, drink = "마셔~ 마셔~ 🍺", extra = "" }){
+  click('fail'); shakeSeat(loser);
+  const g = gamesByKey[key];
+  saveRec(key, val, g.recLabel);
+  const head = html !== undefined ? html : `${why} <b class="drink">${loser.name}</b> ${drink}`;
+  $(msgId).innerHTML = `${head}
+    <span class="record-line">이번 판: ${g.recLabel(val)}${extra} · 최고 기록 ${REC[key].label}</span>`;
+  $(restartId).classList.remove("hidden");
 }
 
 /* ================= ① 입장 → ② 구호 → ③ 메뉴 ================= */
@@ -456,7 +482,7 @@ $("start-btn").addEventListener("click", enter);
 $("name-input").addEventListener("keydown", e => { if(e.key==="Enter") enter(); });
 function enter(){
   audio();
-  playerName = $("name-input").value.trim() || "아무개";
+  playerName = $("name-input").value.replace(/[<>&"']/g, "").trim() || "아무개";   // 이름은 여러 곳의 innerHTML에 들어가므로 HTML 특수문자 제거
   showScreen("chant-screen");
   const crowd = $("chant-crowd"); crowd.innerHTML = "";
   for(let i=0;i<4;i++){
@@ -479,7 +505,7 @@ document.querySelectorAll("[data-menu]").forEach(b => b.addEventListener("click"
   stopAll(); showScreen("menu-screen"); $("slot-box").innerHTML = "&nbsp;";
 }));
 
-/* ================= 게임 데이터 (10개) ================= */
+/* ================= 게임 데이터 (29개) ================= */
 const GAMES = [
   {key:"g31", emj:"🍦", nm:"베스킨라빈스 31", tg:"숫자 눈치",
     intro:"베스킨~ 라빈스~ 써티 원!",
@@ -707,14 +733,7 @@ $("rule-start").addEventListener("click", () => {
 });
 function launchGame(k){
   stopAll();
-  if(k === "g31") start31();
-  else if(k === "subway") startSubway();
-  else if(k === "eomok") startEomok();
-  else if(k === "gongsan") startGongsan();
-  else if(k === "hoppang") startHoppang();
-  else if(k === "shoot") startShoot();
-  else if(GXGAMES[k]) startGeneric(k);
-  else startRhythm(k);   // ddalgi / fruit / reverse / whale
+  ENGINE_OF[k].start(k);
 }
 /* 랜덤게임 시작: 슬롯 연출 후 룰 모달 → 시작 */
 $("menu-random").addEventListener("click", () => {
@@ -760,13 +779,16 @@ $("menu-rank").addEventListener("click", () => {
 });
 
 /* ================= 베스킨라빈스 31 ================= */
-let seats31 = [], cur31 = 0, turn31 = 0, over31 = false, wins31 = 0;
+let seats31 = [], cur31 = 0, turn31 = 0, over31 = false, wins31 = 0, timer31 = 0;
+/* 메뉴로 나가거나 재시작할 때 예약된 NPC 차례를 취소 (안 하면 다음 판에 NPC가 끼어듦) */
+function stop31(){ clearTimeout(timer31); over31 = true; }
 function start31(){
   showScreen("game31-screen");
   seats31 = buildSeats("table31");
   reset31(); loop31();
 }
 function reset31(){
+  clearTimeout(timer31);
   cur31 = 0; turn31 = 0; over31 = false;
   $("count-display").textContent = "시~작!";
   $("count-display").classList.remove("danger");
@@ -784,7 +806,7 @@ function loop31(){
   } else {
     ctrl31(false);
     $("msg31").textContent = `${seats31[turn31].name} 생각 중...`;
-    setTimeout(() => { if(!over31 && seats31.length) npc31(); }, 900 + Math.random()*700);
+    timer31 = setTimeout(() => { if(!over31 && seats31.length) npc31(); }, 900 + Math.random()*700);
   }
 }
 function ctrl31(on){
@@ -821,7 +843,7 @@ function say31(n){
   cd.classList.toggle("danger", cur31 >= 27);
   if(cur31 >= 31){ lose31(p); return; }
   turn31 = (turn31 + 1) % seats31.length;
-  setTimeout(() => { if(!over31) loop31(); }, 700);
+  timer31 = setTimeout(() => { if(!over31) loop31(); }, 700);
 }
 function lose31(p){
   over31 = true; ctrl31(false); click('fail');
@@ -897,7 +919,7 @@ function startRhythm(gameKey){
   R.nextT = performance.now() + 600;
   R.raf = requestAnimationFrame(rLoop);
 }
-function stopRhythm(){ if(R){ cancelAnimationFrame(R.raf); R = null; } }
+function stopRhythm(){ haltState(R); R = null; }
 function buildBeatRow(beats){
   const row = $("beat-row"); row.innerHTML = "";
   for(let b=0;b<beats;b++){
@@ -1034,15 +1056,9 @@ function failRhythm(p, why, customHtml){
   if(!R || R.failed) return;
   R.failed = true;
   cancelAnimationFrame(R.raf);
-  click('fail');
-  shakeSeat(p);
   $("tap-btn").disabled = true;
-  const surv = Math.max(0, R.turnIdx);
-  saveRec(R.key, surv, gamesByKey[R.key].recLabel);
-  const rec = `<span class="record-line">이번 판: ${surv}턴 생존 · 최고 ⚡x${R.speed.toFixed(2)} · 최고 기록 ${REC[R.key].label}</span>`;
-  $("r-msg").innerHTML = (customHtml ? customHtml
-    : `${why} <b class="drink">${p.name}</b> 마셔~ 마셔~ 🍺`) + rec;
-  $("r-restart").classList.remove("hidden");
+  showLose({ key: R.key, val: Math.max(0, R.turnIdx), loser: p, msgId: "r-msg", restartId: "r-restart",
+    why, html: customHtml, extra: ` · 최고 ⚡x${R.speed.toFixed(2)}` });
 }
 $("r-restart").addEventListener("click", () => { const k = R ? R.key : null; stopRhythm(); if(k) startRhythm(k); });
 
@@ -1079,7 +1095,7 @@ function beginSubway(lineKey){
   nextSubway();
   SB.raf = requestAnimationFrame(loopSubway);
 }
-function stopSubway(){ if(SB){ cancelAnimationFrame(SB.raf); SB = null; } }
+function stopSubway(){ haltState(SB); SB = null; }
 function nextSubway(){
   SB.turnCount++;
   SB.seats.forEach((p,i) => p.el.classList.toggle("turn", i === SB.turn));
@@ -1094,17 +1110,29 @@ function nextSubway(){
     SB.deadline = 0;
     $("sub-input").disabled = true; $("sub-say").disabled = true;
     $("msg-sub").textContent = `${p.name} 생각 중...`;
+    const sb = SB;   // 이 판의 상태 — 재시작으로 SB가 바뀌면 예약된 동작은 버린다
     setTimeout(() => {
-      if(!SB || SB.over) return;
+      if(SB !== sb || SB.over) return;
       const remain = SB.line.stations.filter(s => !SB.used.has(normStation(s)));
+      if(!remain.length) return endSubwayAllUsed();
       const pick = rndOf(remain);
       useStation(pick);
       bubbleSay(p, pick + "!", 1000);
       click('word'); hop(p);
       SB.turn = (SB.turn + 1) % SB.seats.length;
-      setTimeout(() => { if(SB && !SB.over) nextSubway(); }, 200);
+      setTimeout(() => { if(SB === sb && !SB.over) nextSubway(); }, 200);
     }, 700 + Math.random()*700);
   }
+}
+/* 노선의 역이 다 나오면 (NPC가 고를 역이 없음) 무승부로 끝낸다 */
+function endSubwayAllUsed(){
+  SB.over = true;
+  cancelAnimationFrame(SB.raf);
+  $("sub-input").disabled = true; $("sub-say").disabled = true;
+  saveRec("subway", SB.usedList.length, gamesByKey.subway.recLabel);
+  $("msg-sub").innerHTML = `🎉 노선의 역이 전부 나왔다! 다 같이 짠~ 🍻
+    <span class="record-line">이번 판: 역 ${SB.usedList.length}개 · 최고 기록 ${REC.subway.label}</span>`;
+  $("restart-sub-btn").classList.remove("hidden");
 }
 function useStation(name){
   SB.used.add(normStation(name));
@@ -1120,8 +1148,8 @@ function playerSubway(){
   if(!raw) return;
   const norm = normStation(raw);
   const valid = SB.line.stations.some(s => normStation(s) === norm);
-  if(!valid) return failSubway(p, `"${raw}"...? 그 노선에 그런 역 없다!`);
-  if(SB.used.has(norm)) return failSubway(p, `"${raw}"는 이미 나온 역이다!`);
+  if(!valid) return failSubway(p, `"${esc(raw)}"...? 그 노선에 그런 역 없다!`);
+  if(SB.used.has(norm)) return failSubway(p, `"${esc(raw)}"는 이미 나온 역이다!`);
   const official = SB.line.stations.find(s => normStation(s) === norm);
   useStation(official);
   bubbleSay(p, official + "!", 1000);
@@ -1129,7 +1157,8 @@ function playerSubway(){
   $("sub-input").value = "";
   $("sub-input").disabled = true; $("sub-say").disabled = true;
   SB.turn = (SB.turn + 1) % SB.seats.length;
-  setTimeout(() => { if(SB && !SB.over) nextSubway(); }, 200);
+  const sb = SB;
+  setTimeout(() => { if(SB === sb && !SB.over) nextSubway(); }, 200);
 }
 $("sub-say").addEventListener("click", playerSubway);
 $("sub-input").addEventListener("keydown", e => { if(e.key === "Enter") playerSubway(); });
@@ -1148,15 +1177,9 @@ function loopSubway(now){
 }
 function failSubway(p, why){
   if(!SB || SB.over) return;
-  SB.over = true;
-  cancelAnimationFrame(SB.raf);
-  click('fail');
-  shakeSeat(p);
+  haltState(SB);
   $("sub-input").disabled = true; $("sub-say").disabled = true;
-  saveRec("subway", SB.usedList.length, gamesByKey.subway.recLabel);
-  $("msg-sub").innerHTML = `${why} <b class="drink">${p.name}</b> 마셔~ 마셔~ 🍺
-    <span class="record-line">이번 판: 역 ${SB.usedList.length}개 · 최고 기록 ${REC.subway.label}</span>`;
-  $("restart-sub-btn").classList.remove("hidden");
+  showLose({ key: "subway", val: SB.usedList.length, loser: p, msgId: "msg-sub", restartId: "restart-sub-btn", why });
 }
 $("restart-sub-btn").addEventListener("click", () => {
   const k = SB ? SB.lineKey : "line2";
@@ -1186,7 +1209,7 @@ function startEomok(){
   EM.timer = setTimeout(nextEomok, 1100);
   EM.raf = requestAnimationFrame(loopEomok);
 }
-function stopEomok(){ if(EM){ cancelAnimationFrame(EM.raf); clearTimeout(EM.timer); EM = null; } }
+function stopEomok(){ haltState(EM); EM = null; }
 function emRemain(cat){
   const r = EOMOK_BANK[cat].words.filter(w => !EM.used.has(w));
   if(r.length === 0){ EOMOK_BANK[cat].words.forEach(w => EM.used.delete(w)); return EOMOK_BANK[cat].words.slice(); }
@@ -1271,15 +1294,9 @@ function loopEomok(now){
 }
 function failEomok(why){
   if(!EM || EM.over) return;
-  EM.over = true;
-  cancelAnimationFrame(EM.raf); clearTimeout(EM.timer);
-  click('fail');
-  shakeSeat(EM.seats[0]);
+  haltState(EM);
   $("em-chips").innerHTML = "";
-  saveRec("eomok", EM.usedList.length, gamesByKey.eomok.recLabel);
-  $("msg-em").innerHTML = `${why} <b class="drink">${EM.seats[0].name}</b> 마셔~ 마셔~ 🍺
-    <span class="record-line">이번 판: 단어 ${EM.usedList.length}개 · 최고 기록 ${REC.eomok.label}</span>`;
-  $("restart-em-btn").classList.remove("hidden");
+  showLose({ key: "eomok", val: EM.usedList.length, loser: EM.seats[0], msgId: "msg-em", restartId: "restart-em-btn", why });
 }
 $("restart-em-btn").addEventListener("click", () => { stopEomok(); startEomok(); });
 
@@ -1306,7 +1323,7 @@ function startGongsan(){
   GS.timer = setTimeout(nextGongsan, 1000);
   GS.raf = requestAnimationFrame(loopGongsan);
 }
-function stopGongsan(){ if(GS){ cancelAnimationFrame(GS.raf); clearTimeout(GS.timer); GS = null; } }
+function stopGongsan(){ haltState(GS); GS = null; }
 function nextGongsan(){
   if(!GS || GS.over) return;
   GS.round++;
@@ -1374,15 +1391,10 @@ function loopGongsan(now){
 }
 function failGongsan(why){
   if(!GS || GS.over) return;
-  GS.over = true;
-  cancelAnimationFrame(GS.raf); clearTimeout(GS.timer);
-  click('fail');
-  shakeSeat(GS.seats[0]);
+  haltState(GS);
   $("gs-targets").innerHTML = "";
-  saveRec("gongsan", GS.round, gamesByKey.gongsan.recLabel);
-  $("msg-gs").innerHTML = `${why} <b class="drink">${GS.seats[0].name}</b> 마시라우~ 🍺
-    <span class="record-line">이번 판: ${GS.round}라운드 · 최고 기록 ${REC.gongsan.label}</span>`;
-  $("restart-gs-btn").classList.remove("hidden");
+  showLose({ key: "gongsan", val: GS.round, loser: GS.seats[0], msgId: "msg-gs", restartId: "restart-gs-btn",
+    why, drink: "마시라우~ 🍺" });
 }
 $("restart-gs-btn").addEventListener("click", () => { stopGongsan(); startGongsan(); });
 
@@ -1402,7 +1414,7 @@ function startHoppang(){
   HP.timer = setTimeout(nextHpRound, 1000);
   HP.raf = requestAnimationFrame(loopHoppang);
 }
-function stopHoppang(){ if(HP){ cancelAnimationFrame(HP.raf); clearTimeout(HP.timer); HP = null; } }
+function stopHoppang(){ haltState(HP); HP = null; }
 function nextHpRound(){
   if(!HP || HP.over) return;
   HP.round++;
@@ -1508,14 +1520,8 @@ function loopHoppang(now){
 }
 function failHoppang(why){
   if(!HP || HP.over) return;
-  HP.over = true;
-  cancelAnimationFrame(HP.raf); clearTimeout(HP.timer);
-  click('fail');
-  shakeSeat(HP.seats[0]);
-  saveRec("hoppang", HP.round - 1, gamesByKey.hoppang.recLabel);
-  $("msg-hp").innerHTML = `${why} <b class="drink">${HP.seats[0].name}</b> 마셔~ 마셔~ 🍺
-    <span class="record-line">이번 판: ${HP.round - 1}라운드 · 최고 기록 ${REC.hoppang.label}</span>`;
-  $("restart-hp-btn").classList.remove("hidden");
+  haltState(HP);
+  showLose({ key: "hoppang", val: HP.round - 1, loser: HP.seats[0], msgId: "msg-hp", restartId: "restart-hp-btn", why });
 }
 $("restart-hp-btn").addEventListener("click", () => { stopHoppang(); startHoppang(); });
 
@@ -1533,9 +1539,7 @@ function startShoot(){
   ST.timer = setTimeout(nextVerse, 1100);
   ST.raf = requestAnimationFrame(loopShoot);
 }
-function stopShoot(){
-  if(ST){ cancelAnimationFrame(ST.raf); clearTimeout(ST.timer); ST.timers.forEach(clearTimeout); ST = null; }
-}
+function stopShoot(){ haltState(ST); ST = null; }
 function nextVerse(){
   if(!ST || ST.over) return;
   ST.verse++;
@@ -1596,18 +1600,12 @@ function loopShoot(now){
 }
 function failShoot(why){
   if(!ST || ST.over) return;
-  ST.over = true;
-  cancelAnimationFrame(ST.raf); clearTimeout(ST.timer); ST.timers.forEach(clearTimeout);
-  click('fail');
-  shakeSeat(ST.seats[0]);
-  saveRec("shoot", ST.verse - 1, gamesByKey.shoot.recLabel);
-  $("msg-st").innerHTML = `${why} <b class="drink">${ST.seats[0].name}</b> 마셔~ 마셔~ 🍺
-    <span class="record-line">이번 판: ${ST.verse - 1}소절 · 최고 기록 ${REC.shoot.label}</span>`;
-  $("restart-st-btn").classList.remove("hidden");
+  haltState(ST);
+  showLose({ key: "shoot", val: ST.verse - 1, loser: ST.seats[0], msgId: "msg-st", restartId: "restart-st-btn", why });
 }
 $("restart-st-btn").addEventListener("click", () => { stopShoot(); startShoot(); });
 
-/* ================= 범용 엔진 (11~30번 게임 공용, GX) ================= */
+/* ================= 범용 엔진 (GXGAMES 19개 공용, GX) ================= */
 function seatNeighbors(i){ return [(i+3)%4, (i+1)%4]; }
 function gxPickTarget(exclude){
   const pool = [0,1,2,3].filter(i => i !== exclude);
@@ -1629,7 +1627,8 @@ function startGeneric(key){
   GX.raf = requestAnimationFrame(gxLoop);
   GX.timer = setTimeout(() => cfg.start(GX), 900);
 }
-function stopGeneric(){ if(GX){ cancelAnimationFrame(GX.raf); clearTimeout(GX.timer); GX = null; } }
+/* haltState가 over=true를 먼저 찍는다: 라운드 함수들은 GX를 인자로 붙잡고 있어서, 전역 GX만 null로 만들면 남은 타이머가 옛 판을 계속 돌린다 */
+function stopGeneric(){ haltState(GX); GX = null; }
 function gxLoop(now){
   if(!GX || GX.over) return;
   const bar = $("bar-gx");
@@ -1649,7 +1648,7 @@ function gxLoop(now){
 }
 function gxSetTimer(ms, onTimeout){ GX.limit = ms; GX.deadline = performance.now() + ms; GX.onTimeout = onTimeout; }
 function gxClearTimer(){ GX.deadline = 0; GX.onTimeout = null; }
-function gxSafeNext(fn, delay=700){ GX.timer = setTimeout(() => { if(GX && !GX.over) fn(); }, delay); }
+function gxSafeNext(fn, delay=700){ const gx = GX; GX.timer = setTimeout(() => { if(GX === gx && !gx.over) fn(); }, delay); }
 function gxBtn(label, onClick, cls=""){
   const b = document.createElement("button");
   b.textContent = label; if(cls) b.className = cls;
@@ -1659,23 +1658,17 @@ function gxBtn(label, onClick, cls=""){
 }
 function gxFail(why, recVal){
   if(!GX || GX.over) return;
-  GX.over = true;
-  cancelAnimationFrame(GX.raf); clearTimeout(GX.timer);
-  click('fail'); shakeSeat(GX.seats[0]);
+  haltState(GX);
   $("gx-controls").innerHTML = "";
   $("gx-input-row").classList.add("hidden");
-  const label = gamesByKey[GX.key].recLabel(recVal);
-  saveRec(GX.key, recVal, gamesByKey[GX.key].recLabel);
-  $("msg-gx").innerHTML = `${why} <b class="drink">${GX.seats[0].name}</b> 마셔~ 마셔~ 🍺
-    <span class="record-line">이번 판: ${label} · 최고 기록 ${REC[GX.key].label}</span>`;
-  $("restart-gx-btn").classList.remove("hidden");
+  showLose({ key: GX.key, val: recVal, loser: GX.seats[0], msgId: "msg-gx", restartId: "restart-gx-btn", why });
 }
 $("restart-gx-btn").addEventListener("click", () => { const k = GX?GX.key:null; stopGeneric(); if(k) startGeneric(k); });
 $("gx-say").addEventListener("click", () => {
   if(!GX || GX.over || GX.key !== "record") return;
   const raw = $("gx-input").value.trim();
   if(!raw) return;
-  if(GX.data.used.has(raw)) return gxFail(`"${raw}"는 이미 나왔다!`, GX.round-1);
+  if(GX.data.used.has(raw)) return gxFail(`"${esc(raw)}"는 이미 나왔다!`, GX.round-1);
   GX.data.used.add(raw);
   bubbleSay(GX.seats[0], raw, 1000); click('word'); hop(GX.seats[0]);
   $("gx-input").value=""; $("gx-input-row").classList.add("hidden");
@@ -2292,6 +2285,26 @@ const GXGAMES = {
   pado2: { title:"🏄 파도게임 (단체)", start(GX){ pado2Round(GX); } },
   record: { title:"🎵 레코드 게임", start(GX){ GX.data.used=new Set(); GX.data.turn=0; recordRound(GX); } },
 };
+
+/* ================= 엔진 등록표 =================
+   게임 추가 방법:
+   - 리듬 게임  → GAMES + RGAMES에 항목 추가
+   - 범용 게임  → GAMES + GXGAMES에 항목 추가 + xxxRound(GX) 작성
+   - 새 전용 엔진 → 화면 HTML + start/stop 함수 + 아래 표에 한 줄 */
+const ENGINES = [
+  { keys: ["g31"],              start: start31,      stop: stop31 },
+  { keys: ["subway"],           start: startSubway,  stop: stopSubway },
+  { keys: ["eomok"],            start: startEomok,   stop: stopEomok },
+  { keys: ["gongsan"],          start: startGongsan, stop: stopGongsan },
+  { keys: ["hoppang"],          start: startHoppang, stop: stopHoppang },
+  { keys: ["shoot"],            start: startShoot,   stop: stopShoot },
+  { keys: Object.keys(RGAMES),  start: startRhythm,  stop: stopRhythm },   // 딸기·과일·리버스·고래
+  { keys: Object.keys(GXGAMES), start: startGeneric, stop: stopGeneric },
+];
+const ENGINE_OF = {};
+ENGINES.forEach(e => e.keys.forEach(k => { ENGINE_OF[k] = e; }));
+/* GAMES에 넣고 엔진 연결을 깜빡하면 바로 알 수 있게 */
+GAMES.forEach(g => { if(!ENGINE_OF[g.key]) console.error(`[랜덤게임] "${g.key}" 게임에 연결된 엔진이 없음`); });
 </script>
 </body>
 </html>
