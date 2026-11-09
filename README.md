@@ -14,7 +14,7 @@ python -m http.server 8766
 ## 구조
 
 ```
-index.html            화면 뼈대 + 스크립트 불러오기 (게임 파일 순서 = 메뉴 순서)
+index.html            공통 화면(입장·메뉴·설명·랭킹·룰) + 스크립트 불러오기 (게임 파일 순서 = 메뉴 순서)
 css/style.css
 js/core.js            공통: 자리 배치, 효과음, 랭킹, 메뉴, registerGame
 js/engines/rhythm.js  리듬 엔진 (딸기·과일·리버스·고래)
@@ -24,12 +24,14 @@ js/games/*.js         게임 하나 = 파일 하나 (변형판은 원판과 같�
 
 빌드 없이 더블클릭으로 열리게 하려고 ES 모듈 대신 일반 `<script>`를 순서대로 불러옵니다.
 
+게임 전용 화면 HTML은 그 게임 파일 맨 위의 `addScreen(/*html*/ \`...\`)` 안에 있습니다. (`file://`에서는 별도 .html 파일을 불러올 수 없어서 JS 안에 둠. VS Code `es6-string-html` 확장을 쓰면 HTML 색 구분이 됩니다.)
+
 ### 게임 추가하기
 
 1. `js/games/새게임.js`를 만들고 맨 위에서 등록한다.
    - 리듬 게임: `registerRhythmGame(설정, { title, bpm, tap, word, pat, intro })`
    - 범용 게임: `registerGxGame(설정, { title, start(GX) })` + 라운드 함수 작성
-   - 새 전용 엔진: `registerGame(설정, { start, stop })` + `index.html`에 화면 추가
+   - 새 전용 엔진: `registerGame(설정, { start, stop })` + 바로 아래에 `addScreen(/*html*/ \`화면\`)`
 2. `index.html`에 `<script src="js/games/새게임.js"></script>`를 원하는 메뉴 위치에 넣는다.
 
 설정은 `{ key, emj, nm, tg, intro, rules, recLabel }`입니다. 기존 게임 파일을 복사해서 시작하면 편해요.

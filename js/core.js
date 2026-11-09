@@ -118,9 +118,11 @@ function enter(){
     } else setTimeout(() => showScreen("menu-screen"), 500);
   })();
 }
-document.querySelectorAll("[data-menu]").forEach(b => b.addEventListener("click", () => {
+/* "← 메뉴" 버튼: 게임 화면은 나중에 addScreen으로 붙으므로 document에서 위임 처리 */
+document.addEventListener("click", e => {
+  if(!e.target.closest("[data-menu]")) return;
   stopAll(); showScreen("menu-screen"); $("slot-box").innerHTML = "&nbsp;";
-}));
+});
 
 /* ================= 게임 등록 =================
    각 게임 파일(js/games/*.js)이 registerGame(설정, 엔진)으로 자기를 등록한다.
@@ -128,6 +130,8 @@ document.querySelectorAll("[data-menu]").forEach(b => b.addEventListener("click"
    - 엔진: { start(key), stop() }
    GAMES 순서 = index.html에서 게임 파일을 불러오는 순서 = 메뉴에 보이는 순서 */
 const GAMES = [], gamesByKey = {}, ENGINE_OF = {};
+/* 게임·엔진 파일이 자기 화면 HTML을 붙인다. 파일 맨 위에서 불러야 아래 코드가 그 화면을 찾을 수 있다 */
+function addScreen(html){ $("rule-modal").insertAdjacentHTML("beforebegin", html); }
 function registerGame(meta, engine){
   if(gamesByKey[meta.key]) console.error(`[랜덤게임] 게임 key 중복: ${meta.key}`);
   GAMES.push(meta); gamesByKey[meta.key] = meta; ENGINE_OF[meta.key] = engine;

@@ -1,3 +1,21 @@
+/* ---- 화면: 리듬 (딸기/과일/리버스/고래 공용) ---- */
+addScreen(/*html*/ `
+<div id="rhythm-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div id="r-title"></div>
+  <div id="r-round">&nbsp;</div>
+  <div id="lyric">&nbsp;</div>
+  <div id="beat-row"></div>
+  <div style="height:14px;"></div>
+  <div id="table-r" class="seat-table"></div>
+  <div id="r-msg" class="msg"></div>
+  <button id="tap-btn" disabled>외쳐!</button>
+  <div class="btn-row">
+    <button id="r-restart" class="hidden btn-green">다시 하기</button>
+  </div>
+</div>
+`);
+
 /* ================= 리듬 엔진 (4↔8박자 전환) ================= */
 /* 리듬 게임은 js/games/에서 registerRhythmGame(설정, 리듬설정)으로 등록한다.
    리듬설정: { title, bpm, tap, word(i), pat(n), intro[16] } */

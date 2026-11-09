@@ -9,6 +9,23 @@ registerGame(
   /* 엔진 */ { start: start31, stop: stop31 }
 );
 
+/* ---- 화면: 베스킨라빈스 31 ---- */
+addScreen(/*html*/ `
+<div id="game31-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">🍦 베스킨라빈스 31</div>
+  <div id="count-display">-</div>
+  <div id="table31" class="seat-table"></div>
+  <div id="msg31" class="msg"></div>
+  <div id="controls31">
+    <button data-n="1">1개 외치기</button>
+    <button data-n="2">2개 외치기</button>
+    <button data-n="3">3개 외치기</button>
+  </div>
+  <button id="restart31-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 베스킨라빈스 31 ================= */
 let seats31 = [], cur31 = 0, turn31 = 0, over31 = false, wins31 = 0, timer31 = 0;
 /* 메뉴로 나가거나 재시작할 때 예약된 NPC 차례를 취소 (안 하면 다음 판에 NPC가 끼어듦) */

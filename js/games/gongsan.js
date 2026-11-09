@@ -9,6 +9,20 @@ registerGame(
   /* 엔진 */ { start: startGongsan, stop: stopGongsan }
 );
 
+/* ---- 화면: 공산당 (왕게임) ---- */
+addScreen(/*html*/ `
+<div id="gongsan-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">✊ 공산당</div>
+  <div id="gs-center" class="big-center">공~산당 공산당!</div>
+  <div class="timer-wrap"><div id="bar-gs" class="timer-bar"></div></div>
+  <div id="table-gs" class="seat-table"></div>
+  <div id="msg-gs" class="msg"></div>
+  <div id="gs-targets" class="btn-row"></div>
+  <button id="restart-gs-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 공산당 (왕게임·복불복) ================= */
 const GS_ORDERS = [   // [멘트, 벌칙 여부]
   ["바로 마시라우!", true],

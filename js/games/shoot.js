@@ -9,6 +9,20 @@ registerGame(
   /* 엔진 */ { start: startShoot, stop: stopShoot }
 );
 
+/* ---- 화면: 슛돌이 (눈치 기립) ---- */
+addScreen(/*html*/ `
+<div id="shoot-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">⚽ 슛돌이</div>
+  <div id="st-center" class="big-center">🎵 날아라~ 슛돌이~</div>
+  <div class="timer-wrap"><div id="bar-st" class="timer-bar"></div></div>
+  <div id="table-st" class="seat-table"></div>
+  <div id="msg-st" class="msg"></div>
+  <button id="st-stand" class="btn-berry" style="font-size:26px;padding:12px 36px;">🙋 일어나기!</button>
+  <button id="restart-st-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 슛돌이 (눈치 기립) ================= */
 const ST_SONG = ["혼자 왔어요~","둘이 왔어요~","셋이 왔어요~","넷이 왔어요~"];
 let ST = null;

@@ -9,6 +9,31 @@ registerGame(
   /* 엔진 */ { start: startSubway, stop: stopSubway }
 );
 
+/* ---- 화면: 지하철 ---- */
+addScreen(/*html*/ `
+<div id="subway-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">🚇 지하철 게임</div>
+  <div id="sub-line-pick" class="btn-row">
+    <div class="sub" style="width:100%;">지하철~ 지하철! 몇호선~ 몇호선! 노선을 골라!</div>
+    <button class="btn-green" data-line="line2">서울 2호선</button>
+    <button class="btn-sky" data-line="incheon1">인천 1호선</button>
+  </div>
+  <div id="sub-play" class="hidden" style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;">
+    <div id="sub-line-name" class="sub"></div>
+    <div class="timer-wrap"><div id="bar-sub" class="timer-bar"></div></div>
+    <div id="table-sub" class="seat-table"></div>
+    <div id="msg-sub" class="msg"></div>
+    <div>
+      <input id="sub-input" placeholder="역 이름!" autocomplete="off">
+      <button id="sub-say" class="btn-sky">외치기!</button>
+    </div>
+    <div id="sub-used"></div>
+    <button id="restart-sub-btn" class="hidden btn-green">다시 하기</button>
+  </div>
+</div>
+`);
+
 /* ================= 지하철 ================= */
 const SUBWAY_LINES = {
   line2: { name:"서울 2호선 🟢", stations:[

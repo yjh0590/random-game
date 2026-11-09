@@ -9,6 +9,21 @@ registerGame(
   /* 엔진 */ { start: startEomok, stop: stopEomok }
 );
 
+/* ---- 화면: 어목조동 ---- */
+addScreen(/*html*/ `
+<div id="eomok-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">🐟 어목조동</div>
+  <div id="em-center" class="big-center">어! 목! 조! 동!</div>
+  <div class="timer-wrap"><div id="bar-em" class="timer-bar"></div></div>
+  <div id="table-em" class="seat-table"></div>
+  <div id="msg-em" class="msg"></div>
+  <div id="em-chips" class="btn-row"></div>
+  <div id="em-used" class="sub" style="max-width:min(520px,92vw);"></div>
+  <button id="restart-em-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 어목조동 ([이름]+[범주] 지목) ================= */
 const EOMOK_BANK = {
   "어": { emj:"🐟", full:"어(물고기)", words:["고등어","연어","참치","광어","멸치","갈치","꽁치","붕어","잉어","상어","가자미","송어","대구","명태","조기"] },

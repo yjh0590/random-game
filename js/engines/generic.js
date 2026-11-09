@@ -1,3 +1,21 @@
+/* ---- 화면: 범용 게임 화면 (GX 엔진 공용) ---- */
+addScreen(/*html*/ `
+<div id="generic-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div id="gx-title" style="font-size:28px;font-weight:700;"></div>
+  <div id="gx-center" class="big-center"></div>
+  <div class="timer-wrap"><div id="bar-gx" class="timer-bar"></div></div>
+  <div id="table-gx" class="seat-table"></div>
+  <div id="msg-gx" class="msg"></div>
+  <div id="gx-controls" class="btn-row"></div>
+  <div id="gx-input-row" class="hidden">
+    <input id="gx-input" placeholder="입력!" autocomplete="off">
+    <button id="gx-say" class="btn-sky">외치기!</button>
+  </div>
+  <button id="restart-gx-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 범용 엔진 (GXGAMES 19개 공용, GX) ================= */
 /* 범용 게임은 js/games/에서 registerGxGame(설정, { title, start(GX) })로 등록한다. */
 const GXGAMES = {};

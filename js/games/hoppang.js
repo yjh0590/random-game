@@ -9,6 +9,26 @@ registerGame(
   /* 엔진 */ { start: startHoppang, stop: stopHoppang }
 );
 
+/* ---- 화면: 호빵찐빵 (007빵식) ---- */
+addScreen(/*html*/ `
+<div id="hoppang-screen" class="screen hidden">
+  <button class="btn-small back-corner" data-menu>← 메뉴</button>
+  <div style="font-size:28px;font-weight:700;">🥟 호빵찐빵</div>
+  <div id="hp-center" class="big-center">호! 빵~ 찐~빵 대빵!</div>
+  <div class="timer-wrap"><div id="bar-hp" class="timer-bar"></div></div>
+  <div id="table-hp" class="seat-table"></div>
+  <div id="msg-hp" class="msg"></div>
+  <div id="hp-controls" class="btn-row">
+    <button data-syl="호">호!</button>
+    <button data-syl="빵">빵!</button>
+    <button data-syl="찐">찐!</button>
+    <button data-syl="대">대!</button>
+    <button data-syl="으악" class="btn-berry">😱 으악!</button>
+  </div>
+  <button id="restart-hp-btn" class="hidden btn-green">다시 하기</button>
+</div>
+`);
+
 /* ================= 호빵찐빵 (007빵식 + 반응) ================= */
 const HP_COMBOS = [ ["호빵", 2], ["찐빵", 4], ["대빵", 6] ];   // [이름, 체인 길이]
 const HP_SYL = ["호","빵","찐","빵","대","빵"];
