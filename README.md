@@ -11,6 +11,16 @@ python -m http.server 8766
 # http://localhost:8766/
 ```
 
+## exe 만들기 (Windows)
+
+```bash
+npm install
+npm start          # 창으로 바로 실행해보기
+npm run dist       # dist/RandomGame-1.0.0.exe 생성 (설치 없이 실행되는 portable)
+```
+
+Electron으로 감쌌습니다. 진입점은 `main.js`. VS Code 터미널처럼 `ELECTRON_RUN_AS_NODE=1`이 설정된 곳에서 실행하면 창이 안 뜨니, 탐색기에서 더블클릭하거나 그 변수를 지우고 실행하세요.
+
 ## 구조
 
 ```

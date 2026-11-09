@@ -1,0 +1,39 @@
+{
+  "name": "random-game",
+  "version": "1.0.0",
+  "description": "브라우저 술게임 모음 — 랜덤게임!",
+  "private": true,
+  "main": "main.js",
+  "author": "yjh3003",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable",
+    "test": "node tests/run.js"
+  },
+  "build": {
+    "appId": "com.yjh3003.randomgame",
+    "productName": "RandomGame",
+    "files": [
+      "main.js",
+      "index.html",
+      "css/**",
+      "js/**"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "RandomGame-${version}.exe"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
+  },
+  "allowScripts": {
+    "electron@45.2.3": true
+  }
+}

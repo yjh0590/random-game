@@ -5,3 +5,7 @@
 
 # 로컬 도구 설정
 .claude/
+
+# exe 빌드 (Electron)
+node_modules/
+dist/
