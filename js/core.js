@@ -138,10 +138,10 @@ function registerGame(meta, engine){
 }
 
 /* ================= 메뉴 동작 ================= */
-let pendingGame = null, ruleStartable = true;
-function openRules(key, startable=true){
+let pendingGame = null;
+function openRules(key){
   const g = gamesByKey[key];
-  pendingGame = key; ruleStartable = startable;
+  pendingGame = key;
   $("rule-title").innerHTML = `${g.emj} ${g.nm}`;
   $("rule-intro").textContent = `🎵 "${g.intro}"`;
   $("rule-list").innerHTML = g.rules.map(l => `<li>${l}</li>`).join("");
@@ -185,7 +185,7 @@ function renderExplain(){
   GAMES.forEach(g => {
     const b = document.createElement("button");
     b.innerHTML = `<span>${g.emj} ${g.nm}</span><span class="tg">${g.tg}</span>`;
-    b.addEventListener("click", () => openRules(g.key, true));
+    b.addEventListener("click", () => openRules(g.key));
     list.appendChild(b);
   });
 }

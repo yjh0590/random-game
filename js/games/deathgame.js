@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"deathgame", emj:"💀", nm:"더 게임 오브 데쓰", tg:"손가락 체인",
     intro:"신이 난다~ 재미난다~ 더 게임 오브 데쓰!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"💀 더 게임 오브 데쓰", start(GX){ deathRound(GX); } }
 );
 
-/* ---- 26. 더 게임 오브 데쓰 ---- */
+/* ---- 더 게임 오브 데쓰 ---- */
 function deathRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -49,3 +52,5 @@ function deathResolve(GX, pointers, host, n){
   };
   tick();
 }
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"egamyeon", emj:"🛒", nm:"~에 가면", tg:"기억력",
     intro:"시장에 가면! 시장에 가면!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🛒 ~에 가면", start(GX){ GX.data.list=[]; egamyeonRound(GX); } }
 );
 
-/* ---- 23. ~에 가면 ---- */
+/* ---- ~에 가면 ---- */
 const EGAMYEON_THEME = { place:"시장", items:["사과","배","수박","참외","딸기","고구마","감자","양파","당근","오이","호박","무","배추","마늘"] };
 function egamyeonRound(GX){
   if(!GX||GX.over) return;
@@ -54,3 +57,5 @@ function egamyeonRound(GX){
     gxSafeNext(()=>egamyeonRound(GX), 900);
   }
 }
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"eomok", emj:"🐟", nm:"어목조동", tg:"지식·순발력",
     intro:"어! 목! 조! 동! 어목조동 어목조동!",
@@ -133,3 +136,5 @@ function failEomok(why){
   showLose({ key: "eomok", val: EM.usedList.length, loser: EM.seats[0], msgId: "msg-em", restartId: "restart-em-btn", why });
 }
 $("restart-em-btn").addEventListener("click", () => { stopEomok(); startEomok(); });
+
+})();

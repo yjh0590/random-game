@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"apart", emj:"🏢", nm:"아파트", tg:"복불복 리빌",
     intro:"아~파트 아파트, 아~파트 아파트!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🏢 아파트", start(GX){ apartRound(GX); } }
 );
 
-/* ---- 12. 아파트 ---- */
+/* ---- 아파트 ---- */
 function apartRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -39,3 +42,5 @@ function apartRound(GX){
     tick();
   });
 }
+
+})();

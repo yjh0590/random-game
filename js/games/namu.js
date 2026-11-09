@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"namu", emj:"🌳", nm:"나무게임", tg:"체인 반응·헬",
     intro:"휘이 하아! 휘이 하아!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🌳 나무게임", start(GX){ GX.data.passer=0; namuRound(GX); } }
 );
 
-/* ---- 19. 나무게임 ---- */
+/* ---- 나무게임 ---- */
 function namuRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -50,3 +53,5 @@ function namuPass(GX, from, target){
     }
   }, 500);
 }
+
+})();

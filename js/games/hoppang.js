@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"hoppang", emj:"🥟", nm:"호빵찐빵", tg:"007빵식",
     intro:"호! 빵~ 찐~빵 대빵!",
@@ -155,3 +158,5 @@ function failHoppang(why){
   showLose({ key: "hoppang", val: HP.round - 1, loser: HP.seats[0], msgId: "msg-hp", restartId: "restart-hp-btn", why });
 }
 $("restart-hp-btn").addEventListener("click", () => { stopHoppang(); startHoppang(); });
+
+})();

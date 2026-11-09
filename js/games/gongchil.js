@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"gongchil", emj:"🎯", nm:"공공칠빵 (+침묵)", tg:"007빵식",
     intro:"공~공칠빵! 공공칠빵!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🎯 공공칠빵", start(GX){ gongchilRound(GX); } }
 );
 
-/* ---- 13. 공공칠빵 (+침묵) ---- */
+/* ---- 공공칠빵 (+침묵) ---- */
 const GONGCHIL_SYL = ["공","공","칠","빵"];
 function gongchilRound(GX){
   if(!GX||GX.over) return;
@@ -59,3 +62,5 @@ function gongchilReact(GX, target){
     gxSafeNext(() => { $("gx-controls").innerHTML=""; gongchilRound(GX); }, 1400);
   }
 }
+
+})();

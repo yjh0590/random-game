@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"banny", emj:"🐰", nm:"바니바니", tg:"체인 반응",
     intro:"바니바니 바니바니~",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🐰 바니바니", start(GX){ GX.data.passer=0; bannyRound(GX); } }
 );
 
-/* ---- 14. 바니바니 ---- */
+/* ---- 바니바니 ---- */
 function bannyRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -45,3 +48,5 @@ function bannyPass(GX, from, target){
     }
   }, 500);
 }
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"mecanderv", emj:"🤖", nm:"메칸더 V", tg:"동작 매칭",
     intro:"메칸더~ V! 메칸더~ V!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🤖 메칸더 V", start(GX){ mecanderRound(GX); } }
 );
 
-/* ---- 22. 메칸더 V ---- */
+/* ---- 메칸더 V ---- */
 const MECANDER = [{k:"me",label:"메 (X자)",emj:"✖️"},{k:"kander",label:"칸더 (어깨)",emj:"🙆"},{k:"v",label:"V (앞으로)",emj:"✌️"}];
 function mecanderRound(GX){
   if(!GX||GX.over) return;
@@ -29,3 +32,5 @@ function mecanderRound(GX){
   }, "chip"));
   gxSetTimer(Math.max(900, 2400-70*GX.round), () => gxFail("동작을 못 골랐다!", GX.round-1));
 }
+
+})();

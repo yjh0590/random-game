@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"pado", emj:"🌊", nm:"파도게임", tg:"웃참",
     intro:"어디서... 파도소리 안 들리세요?",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🌊 파도게임", start(GX){ GX.data.idx=0; padoRound(GX); } }
 );
 
-/* ---- 18. 파도게임 (웃참) ---- */
+/* ---- 파도게임 (웃참) ---- */
 function padoRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -30,3 +33,5 @@ function padoRound(GX){
   }
 }
 function resolvePado(GX){ gxClearTimer(); $("gx-controls").innerHTML=""; gxSafeNext(()=>padoRound(GX), 300); }
+
+})();

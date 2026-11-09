@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"gongsan", emj:"✊", nm:"공산당", tg:"왕게임·복불복",
     intro:"공~산당 공산당 공~산당 공산당!",
@@ -120,3 +123,5 @@ function failGongsan(why){
     why, drink: "마시라우~ 🍺" });
 }
 $("restart-gs-btn").addEventListener("click", () => { stopGongsan(); startGongsan(); });
+
+})();

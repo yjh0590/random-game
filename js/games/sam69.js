@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"sam69", emj:"🔢", nm:"369게임", tg:"숫자·박수",
     intro:"369~ 369! 369~ 369!",
@@ -19,7 +22,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🌀 울트라 369게임", start(GX){ GX.data.idx=0; GX.data.turn=0; ultra69Round(GX); } }
 );
 
-/* ---- 20/21. 369게임 · 울트라 369게임 ---- */
+/* ---- 369게임 · 울트라 369게임 ---- */
 function digitsRestricted(n){ return String(n).split("").filter(d=>"369".includes(d)).length; }
 const KOREAN_NUM = [
   {n:1,syl:["하","나"]},{n:2,syl:["둘"]},{n:3,syl:["셋"]},{n:4,syl:["넷"]},
@@ -79,3 +82,5 @@ function ultra69Round(GX){
     gxSafeNext(()=>ultra69Round(GX), Math.max(280, 550-GX.data.idx*4));
   }
 }
+
+})();

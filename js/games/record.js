@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"record", emj:"🎵", nm:"레코드 게임", tg:"릴레이·지식",
     intro:"레코드~ 레코드~ 칙칙폭폭!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🎵 레코드 게임", start(GX){ GX.data.used=new Set(); GX.data.turn=0; recordRound(GX); } }
 );
 
-/* ---- 29. 레코드 게임 ---- */
+/* ---- 레코드 게임 ---- */
 const RECORD_TITLES = ["다이너마이트","봄날","작은 것들을 위한 시","벚꽃 엔딩","좋은 날","여행","밤편지","아로하","고백","안녕"];
 function recordRound(GX){
   if(!GX||GX.over) return;
@@ -47,3 +50,5 @@ $("gx-say").addEventListener("click", () => {
   gxSafeNext(()=>recordRound(GX), 500);
 });
 $("gx-input").addEventListener("keydown", e => { if(e.key==="Enter") $("gx-say").click(); });
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"janchigi", emj:"🍶", nm:"잔치기", tg:"방향 조작",
     intro:"잔치기 잔치기 짠짠짠!",
@@ -19,7 +22,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"⚡ 잔치기 (스피드)", speed:true, start(GX){ GX.data.idx=0; GX.data.dir=1; janchigiRound(GX); } }
 );
 
-/* ---- 17/30. 잔치기 (+ 스피드 변형) ---- */
+/* ---- 잔치기 (+ 스피드 변형) ---- */
 function janchigiStep(GX, n){
   const len=4;
   if(n===2) GX.data.dir *= -1;
@@ -48,3 +51,5 @@ function janchigiRound(GX){
   }
 }
 function resolveJanchigi(GX){ gxClearTimer(); $("gx-controls").innerHTML=""; gxSafeNext(()=>janchigiRound(GX), 300); }
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"shoot", emj:"⚽", nm:"슛돌이", tg:"눈치 기립",
     intro:"🎵 날아라~ 슛돌이~ (혼자 왔어요→넷이 왔어요)",
@@ -102,3 +105,5 @@ function failShoot(why){
   showLose({ key: "shoot", val: ST.verse - 1, loser: ST.seats[0], msgId: "msg-st", restartId: "restart-st-btn", why });
 }
 $("restart-st-btn").addEventListener("click", () => { stopShoot(); startShoot(); });
+
+})();

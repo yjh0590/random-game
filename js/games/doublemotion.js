@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"doublemotion", emj:"🔁", nm:"이중모션", tg:"동작·순발력",
     intro:"아이엠 그라운드! 이중모션!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🔁 이중모션", start(GX){ GX.data.holder=0; dmRound(GX); } }
 );
 
-/* ---- 25. 이중모션 ---- */
+/* ---- 이중모션 ---- */
 const DM_GESTURES = ["🙆","🙅","🤟","😎"];
 function dmRound(GX){
   if(!GX||GX.over) return;
@@ -41,3 +44,5 @@ function dmPickTarget(GX){
   $("gx-center").innerHTML = "누구에게 넘길까?";
   [1,2,3].forEach(i => gxBtn(`👉 ${GX.seats[i].name}`, () => { GX.data.holder=i; gxSafeNext(()=>dmRound(GX), 400); }));
 }
+
+})();

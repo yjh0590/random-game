@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"pado2", emj:"🏄", nm:"파도게임 (단체)", tg:"복불복·왕게임",
     intro:"파도가 친다~ 짝짝짝짝!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🏄 파도게임 (단체)", start(GX){ pado2Round(GX); } }
 );
 
-/* ---- 27. 파도게임 (단체 잔 비우기) ---- */
+/* ---- 파도게임 (단체 잔 비우기) ---- */
 function pado2Round(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -33,3 +36,5 @@ function resolvePado2(GX, order, leader){
   $("msg-gx").textContent = "다같이 파도 이행 중...";
   gxSafeNext(()=>pado2Round(GX), 1000);
 }
+
+})();

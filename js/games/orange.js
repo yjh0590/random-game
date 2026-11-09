@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"orange", emj:"🍊", nm:"오렌지", tg:"리액션 릴레이",
     intro:"오렌지~ 오렌지~ 오렌지~ 오~",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🍊 오렌지", start(GX){ GX.data.passer=0; orangeRound(GX); } }
 );
 
-/* ---- 15. 오렌지 ---- */
+/* ---- 오렌지 ---- */
 function orangeRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -33,3 +36,5 @@ function orangeRound(GX){
     gxSafeNext(()=>orangeRound(GX), Math.max(400, 900-30*GX.round));
   }
 }
+
+})();

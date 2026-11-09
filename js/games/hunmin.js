@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"hunmin", emj:"🔤", nm:"훈민정음", tg:"단어 순발력",
     intro:"훈~민정음 훈~민정음!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🔤 훈민정음", start(GX){ GX.data.used=new Set(); hunminRound(GX); } }
 );
 
-/* ---- 11. 훈민정음 ---- */
+/* ---- 훈민정음 ---- */
 const HUNMIN_BANK = {
   "ㄱㅂ": ["가방","고비","구비"],
   "ㅂㅈ": ["바지","부자","보증"],
@@ -41,3 +44,5 @@ function hunminRound(GX){
   });
   gxSetTimer(Math.max(1200, 3200 - 90*GX.round), () => gxFail("너무 늦었다! 손 잡혔다!", GX.round-1));
 }
+
+})();

@@ -35,6 +35,15 @@ js/games/*.js         게임 하나 = 파일 하나 (변형판은 원판과 같�
 2. `index.html`에 `<script src="js/games/새게임.js"></script>`를 원하는 메뉴 위치에 넣는다.
 
 설정은 `{ key, emj, nm, tg, intro, rules, recLabel }`입니다. 기존 게임 파일을 복사해서 시작하면 편해요.
+게임 파일 전체는 `(() => { ... })();`로 감싸서, 함수 이름이 다른 게임과 겹쳐도 서로 덮어쓰지 않게 합니다.
+
+## 테스트
+
+```bash
+node tests/run.js
+```
+
+Chrome(또는 Edge) headless로 모든 게임을 하나씩 시작해서 잠깐 돌리고 "← 메뉴"로 나오며 JS 오류를 잡습니다. 30초쯤 걸리고, 실패하면 어느 게임에서 무슨 오류가 났는지 출력합니다. 브라우저를 못 찾으면 `CHROME=경로 node tests/run.js`.
 
 ## 게임 목록 (29개)
 

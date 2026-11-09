@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"g31", emj:"🍦", nm:"베스킨라빈스 31", tg:"숫자 눈치",
     intro:"베스킨~ 라빈스~ 써티 원!",
@@ -103,3 +106,5 @@ function lose31(p){
   $("restart31-btn").classList.remove("hidden");
 }
 $("restart31-btn").addEventListener("click", () => { reset31(); loop31(); });
+
+})();

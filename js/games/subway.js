@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGame(
   {key:"subway", emj:"🚇", nm:"지하철", tg:"지식",
     intro:"지하철~ 지하철! 몇호선~ 몇호선! 덜컹덜컹 아 밀지 마세요~",
@@ -161,3 +164,5 @@ $("restart-sub-btn").addEventListener("click", () => {
   $("sub-play").classList.remove("hidden");
   beginSubway(k);
 });
+
+})();

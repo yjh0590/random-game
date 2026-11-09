@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"hongsam", emj:"🍑", nm:"홍삼게임", tg:"동시 지목",
     intro:"아~ 싸 홍삼! 에브리바디 홍삼!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"🍑 홍삼게임", start(GX){ GX.data.leader=0; hongsamRound(GX); } }
 );
 
-/* ---- 24. 홍삼게임 ---- */
+/* ---- 홍삼게임 ---- */
 function hongsamRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -46,3 +49,5 @@ function hongsamResolve(GX, picks){
   }
   gxSafeNext(()=>hongsamRound(GX), 1100);
 }
+
+})();

@@ -1,3 +1,6 @@
+/* 이 파일의 함수·변수는 이 게임 안에서만 보인다 (다른 게임과 이름이 겹쳐도 안전) */
+(() => {
+
 registerGxGame(
   {key:"chulseok", emj:"📖", nm:"출석부", tg:"눈속임",
     intro:"출석부 출석부 출석부 출석부!",
@@ -9,7 +12,7 @@ registerGxGame(
   /* 엔진 설정 */ { title:"📖 출석부", start(GX){ chulseokRound(GX); } }
 );
 
-/* ---- 16. 출석부 ---- */
+/* ---- 출석부 ---- */
 function chulseokRound(GX){
   if(!GX||GX.over) return;
   GX.round++;
@@ -32,3 +35,5 @@ function chulseokRound(GX){
     gxSafeNext(() => { $("gx-controls").innerHTML=""; chulseokRound(GX); }, 1400);
   }
 }
+
+})();
