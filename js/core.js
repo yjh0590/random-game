@@ -5,32 +5,61 @@ const NPC_NAMES = ["취한 콤이", "안 취한 콤이", "만취 콤이"];
 function rndOf(a){ return a[Math.floor(Math.random()*a.length)]; }
 /* 사용자 입력을 innerHTML에 넣을 때는 꼭 esc()를 거친다 */
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-function doodleSVG(){
-  return `<svg viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
-    <path d="M45 28 Q42 12 60 8 Q80 5 86 18 Q90 30 78 36 Q62 42 50 36 Q45 33 45 28 Z"/>
-    <path d="M46 42 Q30 50 26 72 Q22 92 32 96 Q38 98 42 92 Q40 104 48 112 Q54 118 58 110 Q60 104 59 96 Q62 104 66 112 Q72 120 78 112 Q82 105 78 94 Q84 100 90 94 Q98 86 92 66 Q86 48 72 42 Q58 37 46 42 Z"/>
+/* 굵은 선 캐릭터 (상반신). face: sober/tipsy/wasted, look: -1 왼쪽 · 0 정면 · 1 오른쪽을 본다 */
+const FACES = {
+  sober:  `<circle class="ink" cx="58" cy="44" r="4.5"/><circle class="ink" cx="82" cy="44" r="4.5"/>
+           <path d="M60 58 Q70 66 80 58"/>`,
+  tipsy:  `<ellipse class="blush" cx="50" cy="57" rx="8" ry="5"/><ellipse class="blush" cx="90" cy="57" rx="8" ry="5"/>
+           <path d="M52 46 Q58 39 64 46"/><path d="M76 46 Q82 39 88 46"/>
+           <path d="M60 61 Q65 56 70 61 Q75 66 80 61"/>`,
+  wasted: `<ellipse class="blush" cx="49" cy="57" rx="10" ry="6"/><ellipse class="blush" cx="91" cy="57" rx="10" ry="6"/>
+           <path d="M53 38 L63 48 M63 38 L53 48"/><path d="M77 38 L87 48 M87 38 L77 48"/>
+           <path class="ink" d="M63 59 Q70 72 77 59 Q70 55 63 59 Z"/>`,
+};
+function doodleSVG(face = "sober", look = 0){
+  return `<svg viewBox="0 0 140 150" xmlns="http://www.w3.org/2000/svg">
+    <g transform="rotate(${look*5} 70 150)">
+      <path class="fillp" d="M26 152 Q24 104 48 90 Q70 80 92 90 Q116 104 114 152"/>
+      <path class="fillp" d="M38 46 Q36 14 70 12 Q104 12 103 44 Q102 76 70 77 Q39 77 38 46 Z"/>
+      <g transform="translate(${look*8} 0)">${FACES[face]}</g>
+    </g>
   </svg>`;
 }
+/* 1인칭 시점의 "내 손" (술상 끝에 올려둔 두 손) */
+function handsSVG(){
+  return `<svg viewBox="0 0 240 80" xmlns="http://www.w3.org/2000/svg">
+    <path class="fillp" d="M28 84 Q30 42 52 30 Q74 20 88 36 Q98 50 94 84"/>
+    <path class="fillp" d="M88 42 Q102 34 107 45 Q109 56 94 59"/>
+    <path class="fillp" d="M212 84 Q210 42 188 30 Q166 20 152 36 Q142 50 146 84"/>
+    <path class="fillp" d="M152 42 Q138 34 133 45 Q131 56 146 59"/>
+  </svg>`;
+}
+/* 자리: 0 = 나(손만 보임), 1 = 왼쪽, 2 = 맞은편, 3 = 오른쪽. 옆자리 콤이는 나를 쳐다본다 */
+const SEAT_LOOK = [
+  null,
+  { face: "tipsy",  look:  1 },
+  { face: "sober",  look:  0 },
+  { face: "wasted", look: -1 },
+];
 function buildSeats(containerId){
   const names = [playerName, ...NPC_NAMES];
   const table = $(containerId);
-  /* 원탁 + 술상 데코 (내 시점 테이블!) */
-  table.innerHTML = `<div class="pov-deco"><span>🍶</span><span>🥃</span><span>🍺</span><span>🥃</span><span>🍶</span></div>`;
+  /* 내 앞의 술상 */
+  table.innerHTML = `<div class="pov-deco"><span>🍶</span><span>🥃</span><span class="gap"></span><span>🥃</span><span>🍶</span></div>`;
   return names.map((name, idx) => {
     const seat = document.createElement("div");
-    seat.className = `seat pos${idx}` + (idx===0 ? " me" : "");
-    seat.innerHTML = `<div class="bubble"></div><div class="doodle">${doodleSVG()}</div>
+    const look = SEAT_LOOK[idx];
+    seat.className = `seat pos${idx}` + (idx===0 ? " me" : ` face-${look.face}`);
+    seat.innerHTML = `<div class="bubble"></div>
+      <div class="doodle">${idx===0 ? handsSVG() + `<span class="my-glass">🍺</span>` : doodleSVG(look.face, look.look)}</div>
       <div class="pname">${name}${idx===0?" (나)":""}</div>`;
     table.appendChild(seat);
-    /* 게임에 들어가면 "나"는 페이드아웃 → 1인칭 시점 전환! (이름표는 남음) */
-    if(idx === 0) setTimeout(() => { if(seat.isConnected) seat.classList.add("faded"); }, 900);
     return { name, isHuman: idx===0, el: seat,
       bubble: seat.querySelector(".bubble"), doodle: seat.querySelector(".doodle") };
   });
 }
-/* 걸렸을 때: 내 캐릭터라면 다시 페이드인 되면서 부들부들 + 화면 흔들림 */
+/* 걸렸을 때: 부들부들. 나라면 손이 떨리고 화면도 흔들린다 */
 function shakeSeat(p){
-  p.el.classList.remove("faded");
   p.doodle.classList.remove("shake"); void p.doodle.offsetWidth; p.doodle.classList.add("shake");
   if(p.isHuman){
     const sc = p.el.closest(".screen");
@@ -49,7 +78,12 @@ function stopAll(){ new Set(Object.values(ENGINE_OF)).forEach(e => e.stop()); }
 
 /* ---- 오디오 ---- */
 let AC = null;
-function audio(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+/* 클릭 전에 만들어지면(소리 미리 준비할 때) 멈춘 상태라서, 부를 때마다 깨운다 */
+function audio(){
+  if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)();
+  if(AC.state === "suspended") AC.resume();
+  return AC;
+}
 function click(type){
   try{
     const ctx = audio();
@@ -102,21 +136,20 @@ function enter(){
   playerName = $("name-input").value.replace(/[<>&"']/g, "").trim() || "아무개";   // 이름은 여러 곳의 innerHTML에 들어가므로 HTML 특수문자 제거
   showScreen("chant-screen");
   const crowd = $("chant-crowd"); crowd.innerHTML = "";
-  for(let i=0;i<4;i++){
+  ["tipsy", "sober", "wasted", "sober"].forEach((face, i) => {
     const d = document.createElement("div");
-    d.className = "doodle bounce"; d.style.animationDelay = (i*0.12)+"s";
-    d.innerHTML = doodleSVG(); crowd.appendChild(d);
-  }
-  const lines = [`${playerName}이(가)~`, `좋아하는~`, `랜덤게임!`, `랜덤게임! 🎉`];
-  const el = $("chant-text"); let i = 0;
-  (function next(){
-    if(i < lines.length){
-      el.textContent = lines[i++];
-      el.classList.remove("chant-pop"); void el.offsetWidth; el.classList.add("chant-pop");
-      click(i%2 ? 'clap':'thumb');
-      setTimeout(next, 800);
-    } else setTimeout(() => showScreen("menu-screen"), 500);
-  })();
+    d.className = "doodle bounce";
+    d.style.animationDuration = (60 / CHANT_BPM * 2) + "s";   // 구호 박자에 맞춰 들썩
+    d.style.animationDelay = (i * 0.12) + "s";
+    d.innerHTML = doodleSVG(face); crowd.appendChild(d);
+  });
+  const el = $("chant-text");
+  playChant(playerName, text => {
+    el.textContent = text;
+    el.classList.remove("chant-pop"); void el.offsetWidth; el.classList.add("chant-pop");
+  }, () => {
+    if(!$("chant-screen").classList.contains("hidden")) showScreen("menu-screen");
+  });
 }
 /* "← 메뉴" 버튼: 게임 화면은 나중에 addScreen으로 붙으므로 document에서 위임 처리 */
 document.addEventListener("click", e => {

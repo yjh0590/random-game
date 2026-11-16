@@ -47,7 +47,6 @@ function reset31(){
   $("restart31-btn").classList.add("hidden");
   ctrl31(false);
   seats31.forEach(p => p.doodle.classList.remove("shake"));
-  if(seats31[0]) seats31[0].el.classList.add("faded");   // 다시 내 시점으로!
 }
 function loop31(){
   seats31.forEach((p,i) => p.el.classList.toggle("turn", i===turn31));

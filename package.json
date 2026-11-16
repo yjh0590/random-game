@@ -15,8 +15,10 @@
     "productName": "RandomGame",
     "files": [
       "main.js",
+      "preload.js",
       "index.html",
       "css/**",
+      "sounds/**",
       "js/**"
     ],
     "directories": {

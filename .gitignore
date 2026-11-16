@@ -9,3 +9,6 @@
 # exe 빌드 (Electron)
 node_modules/
 dist/
+
+# 직접 녹음한 효과음은 커밋한다 (원곡 음원은 여기 넣지 말 것)
+!sounds/*.mp3
