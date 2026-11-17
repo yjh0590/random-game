@@ -39,27 +39,27 @@ if(-not $v){ exit 3 }
 $s.SelectVoice($v.VoiceInfo.Name)
 foreach($it in $job){
   $s.SetOutputToWaveFile($it.out)
-  $s.SpeakSsml("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='ko-KR'><prosody pitch='" + $it.pitch + "' rate='fast'>" + $it.text + "</prosody></speak>")
+  $s.SpeakSsml("<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='ko-KR'><prosody pitch='" + $it.pitch + "' rate='" + $it.rate + "'>" + $it.text + "</prosody></speak>")
   $s.SetOutputToNull()
 }`;
 const xmlEsc = s => s.replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&apos;" }[c]));
 
-function synthesize(texts){
+function synthesize(texts, pitches = PITCHES, rate = "fast"){
   return new Promise(resolve => {
     if(process.platform !== "win32") return resolve(null);
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), "rg-tts-"));
     const job = [];
-    texts.forEach((text, i) => PITCHES.forEach((pitch, j) =>
-      job.push({ text: xmlEsc(text), pitch, out: path.join(dir, `${i}_${j}.wav`) })));
+    texts.forEach((text, i) => pitches.forEach((pitch, j) =>
+      job.push({ text: xmlEsc(text), pitch, rate, out: path.join(dir, `${i}_${j}.wav`) })));
     const jobFile = path.join(dir, "job.json");
     fs.writeFileSync(jobFile, JSON.stringify(job), "utf8");
     const encoded = Buffer.from(PS_SCRIPT, "utf16le").toString("base64");
     execFile("powershell.exe", ["-NoProfile", "-NonInteractive", "-EncodedCommand", encoded],
-      { env: { ...process.env, RG_TTS_JOB: jobFile }, timeout: 8000, windowsHide: true },
+      { env: { ...process.env, RG_TTS_JOB: jobFile }, timeout: 15000, windowsHide: true },
       err => {
         let out = null;
         if(!err){
-          try{ out = texts.map((_, i) => PITCHES.map((_, j) => fs.readFileSync(path.join(dir, `${i}_${j}.wav`)))); }
+          try{ out = texts.map((_, i) => pitches.map((_, j) => fs.readFileSync(path.join(dir, `${i}_${j}.wav`)))); }
           catch(e){ out = null; }
         }
         fs.rmSync(dir, { recursive: true, force: true });
@@ -79,6 +79,22 @@ ipcMain.handle("chant-voices", async (_e, texts) => {
     todo.forEach((t, i) => ttsCache.set(t, wavs[i]));
   }
   return texts.map(t => ttsCache.get(t) || null);
+});
+
+/* 음절 하나씩 따로 읽힌 소리 (보통 음높이·보통 빠르기로 1개씩)
+   → 화면 쪽(sound.js)에서 녹음 멜로디의 음·길이에 맞춰 이어 붙인다 */
+const sylCache = new Map();
+ipcMain.handle("sing-syllables", async (_e, syls) => {
+  if(!Array.isArray(syls) || syls.length > 24) return null;
+  syls = syls.map(t => String(t).replace(/[^가-힣]/g, "").slice(0, 2));
+  if(syls.some(t => !t)) return null;
+  const todo = [...new Set(syls.filter(t => !sylCache.has(t)))];
+  if(todo.length){
+    const wavs = await synthesize(todo, ["medium"], "medium");
+    if(!wavs) return null;
+    todo.forEach((t, i) => sylCache.set(t, wavs[i][0]));
+  }
+  return syls.map(t => sylCache.get(t));
 });
 
 app.whenReady().then(createWindow);
